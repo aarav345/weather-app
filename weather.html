@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap" rel="stylesheet">
+    <title>Weather App</title>
+</head>
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Merriweather', serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: #222;
+        background-image: url("https://source.unsplash.com/1600x900/?landscape")
+    }
+    
+    .container {
+        background: #9BACD8d0;
+        padding: 1.4em;
+        border-radius: 1em;
+        width: 100%;
+        max-width: 400px;
+        margin: 1rem;
+        color: #005171;
+    }
+    
+    .search {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    button {
+        margin: 0.5em;
+        border-radius: 50%;
+        height: 2em;
+        width: 2em;
+        background: #7c7c7c2b;
+        cursor: pointer;
+        border: none;
+    }
+    
+    button:hover {
+        background: #7c7c7c6b;
+    }
+    
+    input.search-field {
+        border: none;
+        outline: none;
+        padding: 0.4em;
+        border-radius: 18px;
+        background: #7c7c7c2b;
+        color: white;
+        font-family: inherit;
+        font-size: 16px;
+        width: 100%;
+    }
+    
+    .svg-icon {
+        width: 1em;
+        height: 1em;
+    }
+    
+    .description {
+        font-size: 30px;
+    }
+    
+    .svg-icon path,
+    .svg-icon polygon,
+    .svg-icon rect {
+        fill: #040967;
+    }
+    
+    .svg-icon circle {
+        stroke: #1451a0;
+        stroke-width: 1;
+    }
+    
+    .weather {
+        text-align: center;
+    }
+</style>
+
+<body>
+    <div class="container">
+        <div class="search">
+            <!--search bar for searching weather condition of a city-->
+            <input type="text" class="search-field" placeholder="Search..">
+
+            <!-- when clicked calls function cityName-->
+            <button onclick="cityName()"><svg class="svg-icon" viewBox="0 0 20 20">
+                <path fill="none" d="M19.129,18.164l-4.518-4.52c1.152-1.373,1.852-3.143,1.852-5.077c0-4.361-3.535-7.896-7.896-7.896
+                    c-4.361,0-7.896,3.535-7.896,7.896s3.535,7.896,7.896,7.896c1.934,0,3.705-0.698,5.078-1.853l4.52,4.519
+                    c0.266,0.268,0.699,0.268,0.965,0C19.396,18.863,19.396,18.431,19.129,18.164z M8.567,15.028c-3.568,0-6.461-2.893-6.461-6.461
+                    s2.893-6.461,6.461-6.461c3.568,0,6.46,2.893,6.46,6.461S12.135,15.028,8.567,15.028z"></path>
+            </svg></button>
+        </div>
+        <div class="weather">
+            <!-- inserts images-->
+            <img src="" alt="" class="icon" width="100%">
+            <!-- displays the name of the city-->
+            <h2 class="city">Weather in........</h2>
+
+            <!-- displays the temperature of a city in Celsius-->
+            <h1 class="temp">___°C</h1>
+
+            <!--description of the climatic condition of a city-->
+            <div class="description">______</div>
+
+            <!-- pressure of a city in hPa-->
+            <div class="pressure">Pressure: ___ hPa</div>
+
+            <!-- humidity of a city in percentage-->
+            <div class="humidity">Humidity: __%</div>
+
+            <!--speed of the wind in a city-->
+            <div class="wind">Wind speed: ____ m/s</div>
+
+            <!--direction of the wind in the city-->
+            <div class="direction">wind direction: __°</div>
+
+            <!--last updated date-->
+            <div class="myLastUpdated">...........</div>
+
+
+        </div>
+    </div>
+
+
+
+
+    <script>
+        // fetches data from the local host php server with the help of one parameter : city
+        function weatherData(name) {
+            // Check browser cache first, use if there and less than 10 seconds old
+            if (localStorage.when != null &&
+                parseInt(localStorage.when) + 10000 > Date.now()) {
+                let freshness = Math.round((Date.now() - localStorage.when) / 1000) + " second(s)";
+                document.querySelector(".city").innerText = localStorage.city;
+                document.querySelector(".temp").innerHTML = localStorage.temp;
+                document.querySelector(".icon").src = localStorage.icon;
+                document.querySelector(".pressure").innerHTML = localStorage.pressure;
+                document.querySelector(".description").innerHTML = localStorage.description;
+                document.querySelector(".humidity").innerHTML = localStorage.humidity;
+                document.querySelector(".wind").innerHTML = localStorage.wind;
+                document.querySelector(".direction").innerHTML = localStorage.direction;
+                document.querySelector(".myLastUpdated").innerHTML = freshness;
+
+                // No local cache, access network
+            } else {
+                fetch("http://localhost/2065908_App_Portfolio_3/my-api.php?city=" + name)
+                    // converts the fetched data into json format
+                    .then(response => response.json())
+                    .then(response => {
+                        console.log(response);
+                        // displays the name of the city from search bar
+                        document.querySelector(".city").innerText = "Weather in " + name;
+
+                        // displays the temperature of the city mentioned in the search bar
+                        document.querySelector(".temp").innerHTML = response.Temperature + "°C";
+
+                        // displays an image which signifies the weather of the city 
+                        document.querySelector(".icon").src = "https://openweathermap.org/img/wn/" + response.Icon + "@4x.png";
+
+                        // displays the pressure of the city mentioned in the search bar in hPa
+                        document.querySelector(".pressure").innerText = "Pressure: " + response.Pressure + " hPa";
+
+                        // displays the weather description of the city mentioned in the search bar
+                        document.querySelector(".description").innerText = response.Description;
+
+                        // displays the humidity of the city in percentage
+                        document.querySelector(".humidity").innerText = "Humidity: " + response.Humidity + "%";
+                        // displays the wind speed in m/s
+                        document.querySelector(".wind").innerText = "Wind speed: " + response.Wind_speed + "m/s";
+
+                        // displays the wind direction in degree
+                        document.querySelector(".direction").innerText = "Wind direction: " + response.Wind_direction + "°";
+
+                        // displays the last updated weather
+                        document.querySelector(".myLastUpdated").innerHTML = response.Weather_when;
+
+                        // stores in the local storage
+                        localStorage.city = "Weather in " + name;
+                        localStorage.temp = response.Temperature + "°C";
+                        localStorage.icon = "https://openweathermap.org/img/wn/" + response.Icon + "@4x.png";
+                        localStorage.pressure = "Pressure: " + response.Pressure + " hPa";
+                        localStorage.description = response.Description;
+                        localStorage.humidity = "Humidity: " + response.Humidity + "%";
+                        localStorage.wind = "Wind speed: " + response.Wind_speed + "m/s";
+                        localStorage.direction = "Wind direction: " + response.Wind_direction + "°";
+                        localStorage.when = Date.now();
+                    })
+                    .catch(err => {
+                        // Display errors in console
+                        console.log(err);
+                    });
+            }
+        };
+
+
+
+        function cityName() {
+            // Register service worker
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('sw.js').then(function(registration) {
+                        // Registration was successful
+                        console.log('ServiceWorker registration successful');
+                    }, function(err) {
+                        // registration failed :(
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+                });
+            }
+
+
+            // stores the text content of the search bar in city when the button is pressed
+            let city = document.querySelector(".search-field").value;
+
+            // defaults the value of the city to bakersfield
+            if (city == "") {
+                city = "bakersfield";
+            }
+
+
+            // calls the weatherData function and takes one parameter: city
+            weatherData(city);
+        };
+
+        // this function is called when the search button is clicked
+        cityName();
+    </script>
+</body>
+
+</html>
